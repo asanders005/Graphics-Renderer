@@ -1,6 +1,6 @@
-# Software Renderer
+# C++ Graphics Renderer
 
-A high-performance **Software Renderer** built from scratch to support real-time rendering with customizable **vertex** and **fragment shaders**. This renderer is designed to demonstrate the core principles of rendering, lighting, and post-processing without relying on external hardware acceleration. Additionally, it features an integrated **ray-tracing renderer** for realistic image synthesis.
+A high-performance **Graphics Renderer** built from scratch to support real-time rendering with customizable **vertex** and **fragment shaders**. This renderer is designed to demonstrate the core principles of rendering, lighting, and post-processing without relying on external hardware acceleration. Additionally, it features an integrated **ray-tracing renderer** for realistic image synthesis.
 
 ## Features
 

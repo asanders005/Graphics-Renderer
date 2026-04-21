@@ -2,6 +2,8 @@
 #include "Sphere.h"
 #include "Triangle.h"
 #include "Plane.h"
+#include "Model.h"
+#include "SceneGPU.h"
 
 #include <memory>
 #include <vector>
@@ -20,6 +22,8 @@ public:
 		m_skyBottom = skyBottom;
 		m_skyTop = skyTop;
 	}
+
+	SceneGPU ToGPU() const;
 
 	friend class Tracer;
 

@@ -1,4 +1,5 @@
 #include "Triangle.h"
+#include "MathUtils.cuh"
 
 void Triangle::Update()
 {

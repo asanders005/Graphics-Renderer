@@ -1,5 +1,6 @@
 #pragma once
-#include "MathUtils.h"
+#include "MathUtils.cuh"
+#include "CudaCompat.h"
 #include <glm/glm.hpp>
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/color_space.hpp>
@@ -37,19 +38,10 @@ namespace Color {
 		return 0;
 	}
 
-	inline color_t ColorConvert(const color4_t& color4)
-	{
-		color_t color;
+	HOSTDEVICE color_t ColorConvert(const color4_t& color4);
+	
 
-		color.r = (uint8_t)(Math::Clamp(LinearToGamma(color4.r), 0.0f, 1.0f) * 255);
-		color.g = (uint8_t)(Math::Clamp(LinearToGamma(color4.g), 0.0f, 1.0f) * 255);
-		color.b = (uint8_t)(Math::Clamp(LinearToGamma(color4.b), 0.0f, 1.0f) * 255);
-		color.a = (uint8_t)(Math::Clamp(color4.a, 0.0f, 1.0f) * 255);
-
-		return color;
-	}
-
-	inline color_t ColorConvert(const color3_t& color3)
+	HOSTDEVICE inline color_t ColorConvert(const color3_t& color3)
 	{
 		color_t color;
 
@@ -61,7 +53,7 @@ namespace Color {
 		return color;
 	}
 
-	inline color4_t ColorConvert(const color_t& color)
+	HOSTDEVICE inline color4_t ColorConvert(const color_t& color)
 	{
 		color4_t color4;
 

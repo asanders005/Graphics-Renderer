@@ -1,12 +1,13 @@
 #pragma once
 #define FLT_EPSILON 1.192092896e-07F
+#include "CudaCompat.h"
 #include <random>
 #include <glm/glm.hpp>
 
 namespace Math
 {
 	template<typename T>
-	inline T Clamp(const T& value, const T& min, const T& max)
+	HOSTDEVICE inline T Clamp(const T& value, const T& min, const T& max)
 	{
 		return (value < min) ? min : (value > max) ? max : value;
 	}
@@ -16,24 +17,28 @@ namespace Math
 		return (std::rand() % (max - min) + 1) + min;
 	}
 
-	inline bool approximately(float value1, float value2)
+	HOSTDEVICE inline bool approximately(float value1, float value2)
 	{
 		// check if the difference between the values is less than epsilon
+#ifdef __CUDA_ARCH__
+		return fabsf(value1 - value2) < FLT_EPSILON;
+#else
 		return (std::fabs(value1 - value2) < FLT_EPSILON);
+#endif
 	}
 
 	template<typename T>
-	inline T Lerp(const T& a, const T& b, float t)
+	HOSTDEVICE inline T Lerp(const T& a, const T& b, float t)
 	{
 		return static_cast<T>(a + (t * (b - a)));
 	}
 
-	inline glm::vec3 Reflect(const glm::vec3& incident, const glm::vec3& normal)
+	HOSTDEVICE inline glm::vec3 Reflect(const glm::vec3& incident, const glm::vec3& normal)
 	{
 		return incident - (normal * glm::dot(normal, incident)) * 2.0f;
 	}
 
-	inline bool Refract(const glm::vec3& incident, const glm::vec3& normal, float refractiveIndex, glm::vec3& refracted)
+	HOSTDEVICE inline bool Refract(const glm::vec3& incident, const glm::vec3& normal, float refractiveIndex, glm::vec3& refracted)
 	{
 		glm::vec3 normalIncident = glm::normalize(incident);
 		float cosine = glm::dot(normalIncident, normal);
@@ -48,7 +53,7 @@ namespace Math
 		return false;
 	}
 
-	inline float Schlick(float cosine, float index)
+	HOSTDEVICE inline float Schlick(float cosine, float index)
 	{
 		// Step 1: Calculate the base reflectance at zero incidence (angle = 0)
 		// This is the reflection coefficient when the light hits the surface straight on
@@ -58,20 +63,24 @@ namespace Math
 		// Step 2: Use Schlick's approximation to adjust reflectance based on angle
 		// Schlick’s approximation gives the probability of reflection at an angle `cosine`
 		// It interpolates between `r0` and 1, with stronger reflection at glancing angles
+#ifdef __CUDA_ARCH__
+		return r0 + (1.0f - r0) * powf((1.0f - cosine), 5);
+#else
 		return r0 + (1.0f - r0) * (float)std::pow((1.0f - cosine), 5);
+#endif
 	}
 
-	inline float Dot(const glm::vec3& v1, const glm::vec3& v2)
+	HOSTDEVICE inline float Dot(const glm::vec3& v1, const glm::vec3& v2)
 	{
 		return (v1.x * v2.x) + (v1.y * v2.y) + (v1.z * v2.z);
 	}
 
-	inline float Angle(const glm::vec3& v1, const glm::vec3& v2)
+	HOSTDEVICE inline float Angle(const glm::vec3& v1, const glm::vec3& v2)
 	{
 		return glm::acos(glm::dot(glm::normalize(v1), glm::normalize(v2)));
 	}
 
-	inline glm::vec3 Cross(const glm::vec3& v1, const glm::vec3& v2)
+	HOSTDEVICE inline glm::vec3 Cross(const glm::vec3& v1, const glm::vec3& v2)
 	{
 		glm::vec3 result;
 
@@ -82,7 +91,7 @@ namespace Math
 		return result;
 	}
 
-	inline void QuadraticPoint(int x1, int y1, int x2, int y2, int x3, int y3, float t, int& x, int& y)
+	HOSTDEVICE inline void QuadraticPoint(int x1, int y1, int x2, int y2, int x3, int y3, float t, int& x, int& y)
 	{
 		float omt = 1 - t;
 
@@ -94,7 +103,7 @@ namespace Math
 		y = (int)((a * y1) + (b * y2) + (c * y3));
 	}
 
-	inline void CubicPoint(int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4, float t, int& x, int& y)
+	HOSTDEVICE inline void CubicPoint(int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4, float t, int& x, int& y)
 	{
 		float omt = 1 - t;
 

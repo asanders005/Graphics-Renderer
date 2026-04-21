@@ -1,4 +1,5 @@
 #include "Plane.h"
+#include "MathUtils.cuh"
 
 bool Plane::Hit(const ray_t& ray, rayCastHit_t& rayCastHit, float minDistance, float maxDistance)
 {

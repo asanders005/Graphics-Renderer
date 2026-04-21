@@ -1,6 +1,6 @@
 #include "Framebuffer.h"
 #include "Renderer.h"
-#include "MathUtils.h"
+#include "MathUtils.cuh"
 #include "Image.h"
 
 #include <iostream>

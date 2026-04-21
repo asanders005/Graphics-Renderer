@@ -1,5 +1,5 @@
 #include "PostProcess.h"
-#include "MathUtils.h"
+#include "MathUtils.cuh"
 #include <algorithm>
 #include <cmath>
 

@@ -1,5 +1,5 @@
 #include "Camera.h"
-#include "MathUtils.h"
+#include "MathUtils.cuh"
 #include <glm/gtc/matrix_transform.hpp>
 
 void Camera::SetView(const glm::vec3& eye, const glm::vec3& target, const glm::vec3& up)
@@ -11,16 +11,6 @@ void Camera::SetView(const glm::vec3& eye, const glm::vec3& target, const glm::v
 	m_up = Math::Cross(m_forward, m_right);
 
 	CalculateViewPlane();
-}
-
-ray_t Camera::GetRay(const glm::vec2& point) const
-{
-	ray_t ray;
-
-	ray.origin = m_eye;
-	ray.direction = (m_lowerLeft + (m_horizontal * point.x) + (m_vertical * point.y)) - m_eye;
-
-	return ray;
 }
 
 void Camera::CalculateViewPlane()

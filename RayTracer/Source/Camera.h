@@ -1,5 +1,6 @@
 #pragma once
-#include "Ray.h"
+#include "Ray.cuh"
+#include "CudaCompat.h"
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #define GLM_FORCE_LEFT_HANDED
 #include <glm/glm.hpp>
@@ -7,10 +8,19 @@
 class Camera
 {
 public:
+	HOSTDEVICE Camera() = default;
 	Camera(float fov, float aspectRatio) : m_fov{ fov }, m_aspectRatio{ aspectRatio } {}
 
 	void SetView(const glm::vec3& eye, const glm::vec3& target, const glm::vec3& up = {0, 1, 0});
-	ray_t GetRay(const glm::vec2& point) const;
+	HOSTDEVICE inline ray_t GetRay(const glm::vec2& point) const
+	{
+		ray_t ray;
+
+		ray.origin = m_eye;
+		ray.direction = (m_lowerLeft + (m_horizontal * point.x) + (m_vertical * point.y)) - m_eye;
+
+		return ray;
+	}
 
 	void SetFOV(float fov) { m_fov = fov; }
 

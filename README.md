@@ -21,7 +21,7 @@ A high-performance **Graphics Renderer** built from scratch to support real-time
   - Global illumination.
   - Soft shadows and anti-aliasing.
 
-<img width="1210" height="954" alt="image" src="https://github.com/user-attachments/assets/4d295a1a-0f17-409b-9277-f04f4699ad61" />
+<img width="600" alt="Cornell Box" src="https://github.com/user-attachments/assets/3be75c99-4de7-44a1-8673-34b21abc5b91" />
   
 ### 3. **Flexible Rendering Pipeline**
 - Configurable pipeline stages for detailed customization.

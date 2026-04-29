@@ -1,6 +1,8 @@
 #pragma once
-#include "Color.h"
+#include <SDL.h>
 #include <vector>
+
+using color_t = SDL_Color;
 
 class Framebuffer
 {

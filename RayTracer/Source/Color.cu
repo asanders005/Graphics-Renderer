@@ -1,20 +1,9 @@
-#include "Color.h"
+#include "CudaCompat.h"
+#include "Color.cuh"
 #include <cassert>
 
 namespace Color
 {
-	color_t ColorConvert(const color4_t& color4)
-	{
-		color_t color;
-
-		color.r = (uint8_t)(Math::Clamp(LinearToGamma(color4.r), 0.0f, 1.0f) * 255);
-		color.g = (uint8_t)(Math::Clamp(LinearToGamma(color4.g), 0.0f, 1.0f) * 255);
-		color.b = (uint8_t)(Math::Clamp(LinearToGamma(color4.b), 0.0f, 1.0f) * 255);
-		color.a = (uint8_t)(Math::Clamp(color4.a, 0.0f, 1.0f) * 255);
-
-		return color;
-	}
-
 	color_t(*blend_func)(const color_t& src, const color_t& dst);
 
 	void SetBlendMode(BlendMode blendMode)

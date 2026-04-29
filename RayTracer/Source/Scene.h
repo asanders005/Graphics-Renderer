@@ -1,9 +1,10 @@
 #pragma once
+#include "Color.cuh"
 #include "Sphere.h"
 #include "Triangle.h"
 #include "Plane.h"
 #include "Model.h"
-#include "SceneGPU.h"
+#include "SceneGPU.cuh"
 
 #include <memory>
 #include <vector>
@@ -23,12 +24,12 @@ public:
 		m_skyTop = skyTop;
 	}
 
-	SceneGPU ToGPU() const;
+	SceneGPU* ToGPU() const;
 
 	friend class Tracer;
 
 private:
 	std::vector<std::unique_ptr<SceneObject>> m_objects;
-	color3_t m_skyBottom{ 1 };
+	color3_t m_skyBottom{ 1, 1, 1 };
 	color3_t m_skyTop{ 0.5f, 0.7f, 1.0f };
 };

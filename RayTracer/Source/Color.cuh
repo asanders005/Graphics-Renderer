@@ -1,15 +1,15 @@
 #pragma once
 #include "MathUtils.cuh"
+#include "vec4.cuh"
 #include "CudaCompat.h"
-#include <glm/glm.hpp>
-#define GLM_ENABLE_EXPERIMENTAL
-#include <glm/gtx/color_space.hpp>
 #include <SDL.h>
 #include <algorithm>
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/color_space.hpp>
 
 using color_t = SDL_Color;
-using color3_t = glm::vec3;
-using color4_t = glm::vec4;
+using color3_t = vec3;
+using color4_t = vec4;
 
 
 //blending
@@ -22,23 +22,41 @@ enum class BlendMode
 };
 
 namespace Color {
-	inline color3_t HSVtoRGB(const glm::vec3& hsv)
+	inline color3_t HSVtoRGB(const vec3& hsv)
 	{
-		return glm::rgbColor(hsv);
+		glm::vec3 temp = glm::vec3{ hsv.r, hsv.g, hsv.b };
+		return rgbColor(temp);
 	}
 
 	inline color3_t HSVtoRGB(float hue, float saturation, float value)
 	{
-		return glm::rgbColor(glm::vec3{ hue, saturation, value });
+		return rgbColor(glm::vec3{ hue, saturation, value });
 	}
 
-	inline float LinearToGamma(float linear)
+	HOSTDEVICE inline float LinearToGamma(float linear)
 	{
-		if (linear > 0) return std::sqrt(linear);
+		if (linear > 0)
+		{
+#ifdef __CUDA_ARCH__
+			return powf(linear, 1.0f / 2.2f);
+#else
+			return std::sqrt(linear);
+#endif
+		}
 		return 0;
 	}
 
-	HOSTDEVICE color_t ColorConvert(const color4_t& color4);
+	HOSTDEVICE inline color_t ColorConvert(const color4_t& color4)
+	{
+		color_t color;
+
+		color.r = (uint8_t)(Math::Clamp(LinearToGamma(color4.r), 0.0f, 1.0f) * 255);
+		color.g = (uint8_t)(Math::Clamp(LinearToGamma(color4.g), 0.0f, 1.0f) * 255);
+		color.b = (uint8_t)(Math::Clamp(LinearToGamma(color4.b), 0.0f, 1.0f) * 255);
+		color.a = (uint8_t)(Math::Clamp(color4.a, 0.0f, 1.0f) * 255);
+
+		return color;
+	}
 	
 
 	HOSTDEVICE inline color_t ColorConvert(const color3_t& color3)

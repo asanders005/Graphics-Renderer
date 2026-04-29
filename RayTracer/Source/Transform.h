@@ -1,4 +1,6 @@
 #pragma once
+#include "vec3.cuh"
+
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/transform.hpp>
 #include <glm/gtx/euler_angles.hpp>
@@ -17,6 +19,13 @@ struct Transform
 		position{position}, 
 		rotation{rotation}, 
 		scale{scale} 
+	{}
+	Transform(const vec3& position, 
+		const vec3& rotation = vec3{ 0 },
+		const vec3& scale = vec3{ 1 }) :
+		position{ glm::vec3{ position.x, position.y, position.z } },
+		rotation{ glm::vec3{ rotation.x, rotation.y, rotation.z } },
+		scale{ glm::vec3{ scale.x, scale.y, scale.z } }
 	{}
 
 	glm::mat4 GetMatrix() const

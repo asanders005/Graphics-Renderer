@@ -1,7 +1,8 @@
 #include "Framebuffer.h"
-#include "Renderer.h"
-#include "MathUtils.cuh"
+#include "Color.cuh"
 #include "Image.h"
+#include "MathUtils.cuh"
+#include "Renderer.h"
 
 #include <iostream>
 

@@ -1,8 +1,6 @@
 #include "Model.h"
-#include "Framebuffer.h"
-#include "Camera.h"
-#include "Triangle.h"
-#include "Sphere.h"
+#include "MathUtils.cuh"
+#include <glm/glm.hpp>
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -11,10 +9,11 @@ void Model::Update()
 {
 	for (size_t i = 0; i < m_local_vertices.size(); i++)
 	{
-		m_vb[i] = m_transform * glm::vec4{ m_local_vertices[i], 1 };
+		auto temp = m_transform * glm::vec4{ m_local_vertices[i].x, m_local_vertices[i].y, m_local_vertices[i].z, 1 };
+		m_vb[i] = vertex_t{ temp.x, temp.y, temp.z };
 	}
 
-	m_center = glm::vec3{ 0 };
+	m_center = vec3{ 0 };
 	for (auto& vertex : m_vb)
 	{
 		m_center += vertex;
@@ -24,8 +23,8 @@ void Model::Update()
 	m_radius = 0;
 	for (auto& vertex : m_vb)
 	{
-		float radius = glm::length(vertex - m_center);
-		m_radius = glm::max(radius, m_radius);
+		float radius = Math::Length(vertex - m_center);
+		m_radius = Math::Max(radius, m_radius);
 	}
 }
 
@@ -47,7 +46,7 @@ bool Model::Load(const std::string& filename)
 		if (line.substr(0, 2) == "v ")
 		{
 			std::istringstream sstream{ line.substr(2) };
-			glm::vec3 position;
+			vec3 position;
 			sstream >> position.x;
 			sstream >> position.y;
 			sstream >> position.z;
@@ -77,7 +76,7 @@ bool Model::Load(const std::string& filename)
 				}
 				if (index[0])
 				{
-					glm::vec3 position = vertices[index[0] - 1];
+					vec3 position = vertices[index[0] - 1];
 					m_local_vertices.push_back(position);
 				}
 			}
@@ -87,28 +86,4 @@ bool Model::Load(const std::string& filename)
 	m_vb.resize(m_local_vertices.size());
 	input.close();
 	return true;
-}
-
-bool Model::Hit(const ray_t& ray, rayCastHit_t& rayCastHit, float minDistance, float maxDistance)
-{
-	//check for bounding sphere raycast
-
-	// check cast ray with mesh triangles
-	for (size_t i = 0; i < m_vb.size(); i += 3)
-	{
-		float t;
-		if (!Sphere::Raycast(ray, m_center, m_radius, minDistance, maxDistance, t)) return false;
-		if (Triangle::Raycast(ray, m_vb[i], m_vb[i + 1], m_vb[i + 2], minDistance, maxDistance, t))
-		{
-			rayCastHit.distance = t;
-			rayCastHit.point = ray.At(t);
-			glm::vec3 edge1 = m_vb[i + 1] - m_vb[i];
-			glm::vec3 edge2 = m_vb[i + 2] - m_vb[i];
-			rayCastHit.normal = glm::normalize(glm::cross(edge1, edge2));
-			rayCastHit.material = GetMaterial();
-			return true;
-		}
-	}
-
-    return false;
 }

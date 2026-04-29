@@ -25,6 +25,8 @@
     <RootNamespace>My2D</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
     <ProjectName>RayTracer</ProjectName>
+    <CudaToolkitCustomDir>
+    </CudaToolkitCustomDir>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -138,6 +140,9 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)ThirdParty\SDL2\include;$(SolutionDir)ThirdParty\stb;$(SolutionDir)ThirdParty\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>
+      </PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -155,7 +160,6 @@
     </CudaCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Source\Camera.cpp" />
     <ClCompile Include="Source\Color.cu" />
     <ClCompile Include="Source\ETime.cpp" />
     <ClCompile Include="Source\Framebuffer.cpp" />
@@ -165,22 +169,22 @@
       <FileType>Document</FileType>
     </CudaCompile>
     <ClCompile Include="Source\Model.cpp" />
-    <ClCompile Include="Source\Plane.cpp" />
     <ClCompile Include="Source\PostProcess.cpp" />
     <ClCompile Include="Source\Renderer.cpp" />
     <CudaCompile Include="Source\Scene.cu">
       <FileType>Document</FileType>
     </CudaCompile>
-    <ClCompile Include="Source\Sphere.cpp" />
     <ClCompile Include="Source\Triangle.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Source\Camera.h" />
-    <ClInclude Include="Source\Color.h" />
+    <ClInclude Include="Source\Camera.cuh" />
+    <ClInclude Include="Source\Color.cuh" />
     <ClInclude Include="Source\CudaCompat.h" />
     <ClInclude Include="Source\CudaErrors.h" />
     <ClInclude Include="Source\ETime.h" />
     <ClInclude Include="Source\Framebuffer.h" />
+    <ClInclude Include="Source\GPURaycasting.cuh" />
+    <ClInclude Include="Source\HostRandom.h" />
     <ClInclude Include="Source\Image.h" />
     <ClInclude Include="Source\Input.h" />
     <ClInclude Include="Source\Material.cuh" />
@@ -188,10 +192,10 @@
     <ClInclude Include="Source\MathUtils.cuh" />
     <ClInclude Include="Source\Model.h" />
     <ClInclude Include="Source\Plane.h" />
-    <ClInclude Include="Source\SceneGPU.h" />
+    <ClInclude Include="Source\SceneGPU.cuh" />
     <ClInclude Include="Source\SceneObject.h" />
     <ClInclude Include="Source\PostProcess.h" />
-    <ClInclude Include="Source\Random.cuh" />
+    <ClInclude Include="Source\DeviceRandom.cuh" />
     <ClInclude Include="Source\Ray.cuh" />
     <ClInclude Include="Source\Renderer.h" />
     <ClInclude Include="Source\Scene.h" />
@@ -200,6 +204,13 @@
     <ClInclude Include="Source\Tracer.cuh" />
     <ClInclude Include="Source\Transform.h" />
     <ClInclude Include="Source\Triangle.h" />
+    <ClInclude Include="Source\vec2.cuh" />
+    <ClInclude Include="Source\vec3.cuh" />
+    <ClInclude Include="Source\vec4.cuh" />
+    <ClInclude Include="vec3.cuh" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="pch.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

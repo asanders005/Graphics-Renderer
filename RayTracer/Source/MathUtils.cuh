@@ -1,20 +1,82 @@
 #pragma once
 #define FLT_EPSILON 1.192092896e-07F
 #include "CudaCompat.h"
-#include <random>
-#include <glm/glm.hpp>
+#include "vec2.cuh"
+#include "vec3.cuh"
 
 namespace Math
 {
+	HOSTDEVICE inline float Max(float a, float b)
+	{
+		return (a > b) ? a : b;
+	}
+
+	HOSTDEVICE inline float Min(float a, float b)
+	{
+		return (a < b) ? a : b;
+	}
+
+	HOSTDEVICE inline float Sqrtf(float value)
+	{
+		return sqrtf(value);
+	}
+
+	HOSTDEVICE inline float Length(const vec2& v)
+	{
+		return sqrtf(v.x * v.x + v.y * v.y);
+	}
+
+	HOSTDEVICE inline float Length(const vec3& v)
+	{
+		return sqrtf(v.x * v.x + v.y * v.y + v.z * v.z);
+	}
+
+	HOSTDEVICE inline float Degrees(float radians)
+	{
+		return radians * (180.0f / 3.14159265358979323846f);
+	}
+
+	HOSTDEVICE inline float Radians(float degrees)
+	{
+		return degrees * (3.14159265358979323846f / 180.0f);
+	}
+
+	HOSTDEVICE inline float Dot(const vec3& v1, const vec3& v2)
+	{
+		return (v1.x * v2.x) + (v1.y * v2.y) + (v1.z * v2.z);
+	}
+
+	HOSTDEVICE inline vec3 Normalize(const vec3& v)
+	{
+		float length = Dot(v, v);
+		if (length > 0)
+		{
+			float invLength = 1.0f / sqrtf(length);
+			return v * invLength;
+		}
+		return v; // Return the original vector if its length is zero to avoid division by zero
+	}
+
+	HOSTDEVICE inline float Angle(const vec3& v1, const vec3& v2)
+	{
+		return acosf(Dot(Normalize(v1), Normalize(v2)));
+	}
+
+	HOSTDEVICE inline vec3 Cross(const vec3& v1, const vec3& v2)
+	{
+		vec3 result;
+
+		result.x = (v1.y * v2.z) - (v2.y * v1.z);
+		result.y = (v1.z * v2.x) - (v2.z * v1.x);
+		result.z = (v1.x * v2.y) - (v2.x * v1.y);
+
+		return result;
+	}
+
 	template<typename T>
 	HOSTDEVICE inline T Clamp(const T& value, const T& min, const T& max)
 	{
 		return (value < min) ? min : (value > max) ? max : value;
-	}
-
-	inline int Random(int min, int max)
-	{
-		return (std::rand() % (max - min) + 1) + min;
 	}
 
 	HOSTDEVICE inline bool approximately(float value1, float value2)
@@ -33,20 +95,20 @@ namespace Math
 		return static_cast<T>(a + (t * (b - a)));
 	}
 
-	HOSTDEVICE inline glm::vec3 Reflect(const glm::vec3& incident, const glm::vec3& normal)
+	HOSTDEVICE inline vec3 Reflect(const vec3& incident, const vec3& normal)
 	{
-		return incident - (normal * glm::dot(normal, incident)) * 2.0f;
+		return incident - (normal * Dot(normal, incident)) * 2.0f;
 	}
 
-	HOSTDEVICE inline bool Refract(const glm::vec3& incident, const glm::vec3& normal, float refractiveIndex, glm::vec3& refracted)
+	HOSTDEVICE inline bool Refract(const vec3& incident, const vec3& normal, float refractiveIndex, vec3& refracted)
 	{
-		glm::vec3 normalIncident = glm::normalize(incident);
-		float cosine = glm::dot(normalIncident, normal);
+		vec3 normalIncident = Normalize(incident);
+		float cosine = Dot(normalIncident, normal);
 
 		float discriminant = 1 - (refractiveIndex * refractiveIndex) * (1 - cosine * cosine);
 		if (discriminant > 0)
 		{
-			refracted = refractiveIndex * (normalIncident - (normal * cosine)) - (normal * glm::sqrt(discriminant));
+			refracted = (normalIncident - (normal * cosine)) - (normal * sqrtf(discriminant)) * refractiveIndex;
 			return true;
 		}
 
@@ -70,26 +132,7 @@ namespace Math
 #endif
 	}
 
-	HOSTDEVICE inline float Dot(const glm::vec3& v1, const glm::vec3& v2)
-	{
-		return (v1.x * v2.x) + (v1.y * v2.y) + (v1.z * v2.z);
-	}
 
-	HOSTDEVICE inline float Angle(const glm::vec3& v1, const glm::vec3& v2)
-	{
-		return glm::acos(glm::dot(glm::normalize(v1), glm::normalize(v2)));
-	}
-
-	HOSTDEVICE inline glm::vec3 Cross(const glm::vec3& v1, const glm::vec3& v2)
-	{
-		glm::vec3 result;
-
-		result.x = (v1.y * v2.z) - (v2.y * v1.z);
-		result.y = (v1.z * v2.x) - (v2.z * v1.x);
-		result.z = (v1.x * v2.y) - (v2.x * v1.y);
-
-		return result;
-	}
 
 	HOSTDEVICE inline void QuadraticPoint(int x1, int y1, int x2, int y2, int x3, int y3, float t, int& x, int& y)
 	{

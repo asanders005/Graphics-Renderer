@@ -1,14 +1,13 @@
 #pragma once
-#include "MaterialGPU.h"
 
 struct SceneGPU
 {
 	struct SceneObjectGPU* objects;
 	int numObjects;
 
-	MaterialGPU* materials;
+	struct MaterialGPU* materials;
 	int numMaterials;
 
-	glm::vec3 skyBottom;
-	glm::vec3 skyTop;
+	vec3 skyBottom;
+	vec3 skyTop;
 };

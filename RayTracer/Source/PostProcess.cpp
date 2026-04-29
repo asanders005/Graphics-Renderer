@@ -1,5 +1,6 @@
 #include "PostProcess.h"
 #include "MathUtils.cuh"
+#include "HostRandom.h"
 #include <algorithm>
 #include <cmath>
 
@@ -15,98 +16,98 @@ namespace Post
 		}*/
 
 		std::for_each(buffer.begin(), buffer.end(), [](auto& color)
-			{
-				color.r = 255 - color.r;
-				color.g = 255 - color.g;
-				color.b = 255 - color.b;
-			});
+		{
+			color.r = 255 - color.r;
+			color.g = 255 - color.g;
+			color.b = 255 - color.b;
+		});
 	}
 
 	void Monochrome(std::vector<color_t>& buffer)
 	{
 		std::for_each(buffer.begin(), buffer.end(), [](auto& color)
-			{
-				uint8_t avg = static_cast<uint8_t>((color.r + color.g + color.b) / 3);
+		{
+			uint8_t avg = static_cast<uint8_t>((color.r + color.g + color.b) / 3);
 
-				color.r = avg;
-				color.g = avg;
-				color.b = avg;
-			});
+			color.r = avg;
+			color.g = avg;
+			color.b = avg;
+		});
 	}
 
 	void ColorBalance(std::vector<color_t>& buffer, int ro, int go, int bo)
 	{
 		std::for_each(buffer.begin(), buffer.end(), [ro, go, bo](auto& color)
-			{
-				color.r = static_cast<uint8_t>(Math::Clamp(color.r + ro, 0, 255));
-				color.g = static_cast<uint8_t>(Math::Clamp(color.g + go, 0, 255));
-				color.b = static_cast<uint8_t>(Math::Clamp(color.b + bo, 0, 255));
-			});
+		{
+			color.r = static_cast<uint8_t>(Math::Clamp(color.r + ro, 0, 255));
+			color.g = static_cast<uint8_t>(Math::Clamp(color.g + go, 0, 255));
+			color.b = static_cast<uint8_t>(Math::Clamp(color.b + bo, 0, 255));
+		});
 	}
 
 	void Brightness(std::vector<color_t>& buffer, int brightness)
 	{
 		std::for_each(buffer.begin(), buffer.end(), [brightness](auto& color)
-			{
-				color.r = static_cast<uint8_t>(Math::Clamp(color.r + brightness, 0, 255));
-				color.g = static_cast<uint8_t>(Math::Clamp(color.g + brightness, 0, 255));
-				color.b = static_cast<uint8_t>(Math::Clamp(color.b + brightness, 0, 255));
-			});
+		{
+			color.r = static_cast<uint8_t>(Math::Clamp(color.r + brightness, 0, 255));
+			color.g = static_cast<uint8_t>(Math::Clamp(color.g + brightness, 0, 255));
+			color.b = static_cast<uint8_t>(Math::Clamp(color.b + brightness, 0, 255));
+		});
 	}
 
 	void Noise(std::vector<color_t>& buffer, uint8_t noise)
 	{
 		std::for_each(buffer.begin(), buffer.end(), [noise](auto& color)
-			{
-				color.r = static_cast<uint8_t>(Math::Clamp(color.r + Math::Random(-noise, noise), 0, 255));
-				color.g = static_cast<uint8_t>(Math::Clamp(color.g + Math::Random(-noise, noise), 0, 255));
-				color.b = static_cast<uint8_t>(Math::Clamp(color.b + Math::Random(-noise, noise), 0, 255));
-			});
+		{
+			color.r = static_cast<uint8_t>(Math::Clamp(color.r + random(-noise, noise), 0, 255));
+			color.g = static_cast<uint8_t>(Math::Clamp(color.g + random(-noise, noise), 0, 255));
+			color.b = static_cast<uint8_t>(Math::Clamp(color.b + random(-noise, noise), 0, 255));
+		});
 	}
 
 	void Threshold(std::vector<color_t>& buffer, uint8_t threshold)
 	{
 		std::for_each(buffer.begin(), buffer.end(), [threshold](auto& color)
-			{
-				uint8_t avg = static_cast<uint8_t>((color.r + color.g + color.b) / 3);
+		{
+			uint8_t avg = static_cast<uint8_t>((color.r + color.g + color.b) / 3);
 
-				if (avg >= threshold)
-				{
-					color.r = 255;
-					color.g = 255;
-					color.b = 255;
-				}
-				else
-				{
-					color.r = 0;
-					color.g = 0;
-					color.b = 0;
-				}
-			});
+			if (avg >= threshold)
+			{
+				color.r = 255;
+				color.g = 255;
+				color.b = 255;
+			}
+			else
+			{
+				color.r = 0;
+				color.g = 0;
+				color.b = 0;
+			}
+		});
 	}
 
-    void Posterize(std::vector<color_t>& buffer, uint8_t levels)
-    {
+	void Posterize(std::vector<color_t>& buffer, uint8_t levels)
+	{
 		uint8_t level = 255 / levels;
 
 		std::for_each(buffer.begin(), buffer.end(), [level](auto& color)
-			{
-				color.r = (color.r / level) * level;
-				color.g = (color.g / level) * level;
-				color.b = (color.b / level) * level;
-			});
-    }
+		{
+			color.r = (color.r / level) * level;
+			color.g = (color.g / level) * level;
+			color.b = (color.b / level) * level;
+		});
+	}
 
 	void Alpha(std::vector<color_t>& buffer, uint8_t alpha)
 	{
 		std::for_each(buffer.begin(), buffer.end(), [alpha](auto& color)
-			{
-				color.a = alpha;
-			});
+		{
+			color.a = alpha;
+		});
 	}
 
-    void BoxBlur(std::vector<color_t>& buffer, int width, int height)
-    {
+	void BoxBlur(std::vector<color_t>& buffer, int width, int height)
+	{
 		std::vector<color_t> source = buffer;
 
 		int k[3][3] =
@@ -144,7 +145,7 @@ namespace Post
 			color.g = static_cast<uint8_t>(g / 9);
 			color.b = static_cast<uint8_t>(b / 9);
 		}
-    }
+	}
 
 	void GaussianBlur(std::vector<color_t>& buffer, int width, int height)
 	{
@@ -278,8 +279,8 @@ namespace Post
 		}
 	}
 
-    void Emboss(std::vector<color_t>& buffer, int width, int height)
-    {
+	void Emboss(std::vector<color_t>& buffer, int width, int height)
+	{
 		std::vector<color_t> source = buffer;
 
 		int k[3][3] =
@@ -316,7 +317,7 @@ namespace Post
 			color.g = static_cast<uint8_t>(Math::Clamp(sum, 0, 255));
 			color.b = static_cast<uint8_t>(Math::Clamp(sum, 0, 255));
 		}
-    }
+	}
 
 	void EmbossColor(std::vector<color_t>& buffer, int width, int height)
 	{

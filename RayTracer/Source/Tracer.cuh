@@ -1,13 +1,12 @@
 #pragma once
-#include "Color.h"
 #include "CudaCompat.h"
-#include "SceneObjectGPU.cuh"
-#include "SceneGPU.h"
+#include "Color.cuh"
+#include "GPURaycasting.cuh"
 #include "Material.cuh"
 
 HOSTDEVICE inline color3_t Trace(
-	struct SceneGPU& scene, 
-	const struct ray_t& ray, 
+	struct SceneGPU* scene, 
+	const struct ray_t* ray, 
 	float minDistance, 
 	float maxDistance, 
 	int depth
@@ -16,33 +15,50 @@ HOSTDEVICE inline color3_t Trace(
 #endif 
 )
 {
-	if (depth == 0) return color3_t{ 0 };
+	if (depth == 0) return color3_t{ 1 };
 
-	rayCastHit_t rayCastHit;
-	float closestDistance = maxDistance;
+	rayCastHit_t closestHit;
+	closestHit.distance = maxDistance;
 	bool isHit = false;
 
 	//Check for object hit
-	for (int i = 0; scene.numObjects; ++i)
+	for (int i = 0; i < scene->numObjects; ++i)
 	{
-		if (SceneObjectGPU_Hit(scene.objects[i], scene, ray, rayCastHit, minDistance, closestDistance))
+		rayCastHit_t tempHit;
+		/*if (scene->objects[i].materialIndex != 0)
 		{
-			isHit = true;
-			closestDistance = rayCastHit.distance;
+			printf("Testing hit for object %d of type %d with material index %d\n", i, (int)scene->objects[i].type, scene->objects[i].materialIndex);
+		}*/
+
+		if (SceneObjectGPU_Hit(&scene->objects[i], scene, ray, &tempHit, minDistance, closestHit.distance))
+		{
+			if (!isnan(tempHit.distance) && tempHit.distance < closestHit.distance)
+			{
+				closestHit = tempHit;
+				isHit = true;
+			}
 		}
 	}
 
 	if (isHit)
 	{
+		if (isnan(closestHit.distance))
+		{
+			printf("NaN distance hit\n");
+			return color3_t{ 0 };
+		}
+
+		//printf("Hit object at distance %f\n", closestHit.distance);
 		color3_t attenuation;
 		ray_t scatter;
-		if (Material::Scatter(ray, rayCastHit, attenuation, scatter
+		if (Material::Scatter(ray, &closestHit, &attenuation, &scatter
 #ifdef __CUDA_ARCH__
 			, state
 #endif
 		))
 		{
-			return attenuation * Trace(scene, scatter, minDistance, maxDistance, depth - 1
+			//if (attenuation != vec3 { 1 }) printf("Hit non-emissive material with color (%f, %f, %f)\n", attenuation.x, attenuation.y, attenuation.z);
+			return attenuation * Trace(scene, &scatter, minDistance, maxDistance, depth - 1
 #ifdef __CUDA_ARCH__
 				, state
 #endif
@@ -50,14 +66,16 @@ HOSTDEVICE inline color3_t Trace(
 		}
 		else
 		{
-			return Material::GetEmissive(*rayCastHit.material);
+			color3_t emissiveColor = Material::GetEmissive(*closestHit.material);
+			//printf("Hit emissive material with color (%f, %f, %f)\n", emissiveColor.x, emissiveColor.y, emissiveColor.z);
+			return emissiveColor;
 		}
 	}
 
-	glm::vec3 direction = glm::normalize(ray.direction);
+	vec3 direction = Math::Normalize(ray->direction);
 
 	float t = (direction.y + 1) * 0.5f;
-	color3_t color = Math::Lerp(scene.skyBottom, scene.skyTop, t);
+	color3_t color = Math::Lerp(scene->skyBottom, scene->skyTop, t);
 
 	return color;
 }

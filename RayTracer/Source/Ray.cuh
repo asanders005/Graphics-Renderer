@@ -1,26 +1,24 @@
 #pragma once
 #include "CudaCompat.h"
-#include <glm/glm.hpp>
+#include "vec3.cuh"
 #include <memory>
 
 struct ray_t
 {
-	glm::vec3 origin;
-	glm::vec3 direction;
+	vec3 origin;
+	vec3 direction;
 	
 	ray_t() = default;
-	ray_t(const glm::vec3& origin, const glm::vec3& direction) : origin{ origin }, direction{ direction } {}
-
-	HOSTDEVICE inline glm::vec3 At(float t) const { return origin + direction * t; }
-	HOSTDEVICE inline glm::vec3 operator * (float t) const { return origin + direction * t; }
+	HOSTDEVICE inline ray_t(const vec3& origin, const vec3& direction) : origin{ origin }, direction{ direction } {}
 };
+HOSTDEVICE inline vec3 RayAt(const ray_t* ray, float t) { return ray->origin + ray->direction * t; }
 
 struct rayCastHit_t
 {
 	float distance{ 0 };
 	
-	glm::vec3 point{ 0 };
-	glm::vec3 normal{ 0 };
+	vec3 point;
+	vec3 normal;
 
-	struct MaterialGPU* material;
+	struct MaterialGPU* material{ nullptr };
 };

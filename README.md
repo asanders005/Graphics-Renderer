@@ -15,19 +15,21 @@ A high-performance **Graphics Renderer** built from scratch to support real-time
 
 ### 2. **Ray-Tracing Renderer**
 - Implements a **path-tracing algorithm** for highly realistic lighting and shadows.
+- Utilizes **GPU processing** through NVIDIA CUDA Toolkit for quick and efficient rendering 
 - Supports:
   - Reflection and refraction.
   - Global illumination.
   - Soft shadows and anti-aliasing.
 
-<img width="600" alt="CornellBox" src="https://github.com/user-attachments/assets/8b004bb6-79e9-482d-a9f2-0c48097b4aa0">
+<img width="1210" height="954" alt="image" src="https://github.com/user-attachments/assets/4d295a1a-0f17-409b-9277-f04f4699ad61" />
   
 ### 3. **Flexible Rendering Pipeline**
 - Configurable pipeline stages for detailed customization.
 - Debugging tools to inspect vertex transformation and fragment generation.
 
 ### Prerequisites
-- A C++11 (or higher) compiler.
+- A C++17 (or higher) compiler.
+- **NVIDIA CUDA Toolkit** 13.2 (or higher) installed on your system.
 - Supported platforms: Windows.
 - Libraries: 
   - **SDL2** (for windowing and input handling).
